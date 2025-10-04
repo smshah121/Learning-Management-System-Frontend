@@ -14,11 +14,18 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await signup({ name, email, password }).unwrap();
+      const res = await signup({ name, email, password, role }).unwrap();
+      // ✅ If you want auto-login
+      localStorage.setItem("token", res.access_token);
+      localStorage.setItem("role", res.role);
+      localStorage.setItem("id", res.id);
       alert('Signup successful! Please log in.');
       navigate('/');
+      // navigate based on role
+      
+
     } catch (err) {
-      console.error('Signup failed:', err);
+      console.error("Signup failed", err);
     }
   };
 
