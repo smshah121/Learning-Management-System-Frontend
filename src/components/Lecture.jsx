@@ -80,6 +80,7 @@ const CourseLectures = ({ course }) => {
                           rel="noopener noreferrer"
                           className="hover:underline flex items-center gap-1"
                           title={fileName}
+                          download
                         >
                           <FaFileAlt className="text-blue-500" />
                           Lecture Link
