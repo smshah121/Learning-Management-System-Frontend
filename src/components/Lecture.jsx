@@ -75,7 +75,7 @@ const CourseLectures = ({ course }) => {
                     return (
                       <li key={index}>
                         <a
-                          href={`http://localhost:3000${docUrl}`}
+                          href={docUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="hover:underline flex items-center gap-1"
