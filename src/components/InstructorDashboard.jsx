@@ -32,7 +32,8 @@ import InstructorAnnouncement from './AnnouncementInstructor';
 const InstructorDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const base_url = import.meta.env.VITE_API_URL
+  const base_url = import.meta.env.VITE_API_URL.replace(/\/+$/, '');
+
   
 
   
