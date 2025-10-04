@@ -32,6 +32,7 @@ import InstructorAnnouncement from './AnnouncementInstructor';
 const InstructorDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const base_url = import.meta.env.VITE_API_URL
   
 
   
@@ -87,34 +88,55 @@ if (!token) return null;
   };
 
   const handleAddLecture = async () => {
-    if (!lectureTitle || !selectedCourseId)
-      return alert('All fields are required');
+  if (!lectureTitle || !selectedCourseId)
+    return alert('All fields are required');
 
-    const formData = new FormData();
-    formData.append('title', lectureTitle);
-    formData.append('courseId', Number(selectedCourseId));
-
-    docs.forEach((file) => {
-      formData.append('docs', file);
-    });
-
-    try {
-      await axios.post('http://localhost:3000/lectures', formData, {
+  try {
+    // 1️⃣ Create lecture
+    const lectureRes = await axios.post(
+      `${base_url}/lectures`,
+      { 
+        title: lectureTitle,
+        courseId: Number(selectedCourseId)
+      },
+      {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-      });
+      }
+    );
+    const lectureId = lectureRes.data.id;
 
-      alert('✅ Lecture added with docs');
-      setLectureTitle('');
-      setDocs([]);
-      refetchLectures();
-    } catch (error) {
-      console.error(error);
-      alert('❌ Failed to add lecture');
+    // 2️⃣ Upload docs
+    if (docs.length > 0) {
+      for (let file of docs) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        await axios.post(
+          `${base_url}/lectures/${lectureId}/docs`,  // ✅ Corrected endpoint
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+      }
     }
-  };
+
+    alert("✅ Lecture created with docs");
+    setLectureTitle("");
+    setDocs([]);
+    refetchLectures();
+  } catch (error) {
+    console.error(error);
+    alert("❌ Failed to add lecture");
+  }
+};
+
+
 
   const handleRemoveLecture = async ({ id, courseId }) => {
     const confirm = window.confirm('Are you sure you want to delete this lecture?');
@@ -281,7 +303,7 @@ if (!token) return null;
                             return (
                               <li key={index}>
                                 <a
-                                  href={`http://localhost:3000${docUrl}`}
+                                  href={docUrl}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="hover:underline flex items-center gap-1"
